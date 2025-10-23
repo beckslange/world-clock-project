@@ -21,8 +21,16 @@
         <option value="Asia/Tokyo">Tokyo</option>
       </select>
 
+      <a href="#" id="home-link" style="display: none">🏠 Back to Homepage</a>
+
       <div id="cities">
-        <div class="city" id="los-angeles">
+        <div
+          class="city"
+          id="los-angeles"
+          data-timezone="America/Los_Angeles"
+          draggable="true"
+        >
+          <span class="drag-handle">☰</span>
           <div>
             <h2>Los Angeles 🇺🇸</h2>
             <div class="date"></div>
@@ -31,7 +39,13 @@
           <button class="remove-btn">×</button>
         </div>
 
-        <div class="city" id="sydney">
+        <div
+          class="city"
+          id="sydney"
+          data-timezone="Australia/Sydney"
+          draggable="true"
+        >
+          <span class="drag-handle">☰</span>
           <div>
             <h2>Sydney 🇦🇺</h2>
             <div class="date"></div>
@@ -43,8 +57,13 @@
     </div>
 
     <footer>
-      This project was coded by <strong>Rebecca Lange</strong>, is open-sourced
-      on
+      This project was coded by
+      <a
+        href="https://app.netlify.com/teams/beckslange/projects"
+        target="_blank"
+        ><strong>Rebecca Lange</strong>,</a
+      >
+      is open-sourced on
       <a
         href="https://github.com/beckslange/world-clock-project"
         target="_blank"
@@ -54,6 +73,7 @@
         >Netlify</a
       >.
     </footer>
+
     <script src="src/index.js"></script>
   </body>
 </html>

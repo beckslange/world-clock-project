@@ -1,20 +1,13 @@
 function updateTime() {
-  let cityElements = document.querySelectorAll(".city");
+  const cityElements = document.querySelectorAll(".city");
 
   cityElements.forEach((cityElement) => {
-    let timezone =
-      cityElement.getAttribute("data-timezone") ||
-      (cityElement.id === "los-angeles"
-        ? "America/Los_Angeles"
-        : cityElement.id === "sydney"
-        ? "Australia/Sydney"
-        : null);
-
+    const timezone = cityElement.getAttribute("data-timezone");
     if (!timezone) return;
 
-    let cityTime = moment().tz(timezone);
-    let dateElement = cityElement.querySelector(".date");
-    let timeElement = cityElement.querySelector(".time");
+    const cityTime = moment().tz(timezone);
+    const dateElement = cityElement.querySelector(".date");
+    const timeElement = cityElement.querySelector(".time");
 
     dateElement.innerHTML = cityTime.format("dddd, MMM Do, YYYY");
     timeElement.innerHTML = cityTime.format("h:mm:ss [<small>]A[</small>]");
@@ -23,21 +16,18 @@ function updateTime() {
 
 function updateCity(event) {
   let cityTimezone = event.target.value;
-  if (cityTimezone === "current") {
-    cityTimezone = moment.tz.guess();
-  }
+  if (cityTimezone === "current") cityTimezone = moment.tz.guess();
   if (!cityTimezone) return;
 
-  let cityName = cityTimezone.replace("_", " ").split("/")[1];
-  let existingCity = document.querySelector(
+  const cityName = cityTimezone.replace("_", " ").split("/")[1];
+  const existingCity = document.querySelector(
     `[data-timezone='${cityTimezone}']`
   );
-  if (existingCity) return;
+  const citiesElement = document.querySelector("#cities");
 
-  let citiesElement = document.querySelector("#cities");
-
-  let cityHTML = `
-    <div class="city" data-timezone="${cityTimezone}">
+  const cityHTML = `
+    <div class="city" data-timezone="${cityTimezone}" draggable="true">
+      <span class="drag-handle">☰</span>
       <div>
         <h2>${cityName}</h2>
         <div class="date"></div>
@@ -47,21 +37,117 @@ function updateCity(event) {
     </div>
   `;
 
-  citiesElement.insertAdjacentHTML("beforeend", cityHTML);
+  if (existingCity) {
+    if (event.target.value === "current") {
+      existingCity.remove();
+      citiesElement.insertAdjacentHTML("afterbegin", cityHTML);
+    }
+  } else {
+    if (event.target.value === "current") {
+      citiesElement.insertAdjacentHTML("afterbegin", cityHTML);
+    } else {
+      citiesElement.insertAdjacentHTML("beforeend", cityHTML);
+    }
+  }
+
+  // Show Home link when a city is selected
+  homeLink.style.display = "inline";
+
   updateTime();
+  enableDragAndDrop();
 }
 
 function removeCity(event) {
   if (event.target.classList.contains("remove-btn")) {
     event.target.parentElement.remove();
+    checkHomeLink();
   }
 }
 
+// Drag-and-drop functionality
+function enableDragAndDrop() {
+  const container = document.querySelector("#cities");
+  let draggedItem = null;
+
+  container.querySelectorAll(".city").forEach((city) => {
+    city.onmousedown = null;
+
+    city.addEventListener("dragstart", (e) => {
+      draggedItem = city;
+      city.classList.add("dragging");
+    });
+
+    city.addEventListener("dragend", () => {
+      draggedItem.classList.remove("dragging");
+      draggedItem = null;
+    });
+  });
+
+  container.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    const afterElement = getDragAfterElement(container, e.clientY);
+    if (afterElement == null) {
+      container.appendChild(draggedItem);
+    } else {
+      container.insertBefore(draggedItem, afterElement);
+    }
+  });
+}
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [
+    ...container.querySelectorAll(".city:not(.dragging)"),
+  ];
+
+  return draggableElements.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset: offset, element: child };
+      } else {
+        return closest;
+      }
+    },
+    { offset: Number.NEGATIVE_INFINITY }
+  ).element;
+}
+
+// Home link functionality
+const homeLink = document.createElement("a");
+homeLink.href = "#";
+homeLink.id = "home-link";
+homeLink.innerHTML = "🏠 Back to Homepage";
+homeLink.style.display = "none";
+homeLink.style.marginLeft = "10px";
+document
+  .querySelector(".container")
+  .insertBefore(homeLink, document.querySelector("#cities"));
+
+homeLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  document.querySelector("#city").value = "";
+  homeLink.style.display = "none";
+  // Optionally hide all dynamically added cities except default ones
+  document.querySelectorAll("#cities .city").forEach((city) => {
+    if (!city.id) city.remove();
+  });
+});
+
+// Helper to check if Home link should be hidden
+function checkHomeLink() {
+  const dynamicCities = document.querySelectorAll("#cities .city:not([id])");
+  if (dynamicCities.length === 0) homeLink.style.display = "none";
+}
+
+// Initial setup
 updateTime();
 setInterval(updateTime, 1000);
 
-let citiesSelectElement = document.querySelector("#city");
+const citiesSelectElement = document.querySelector("#city");
 citiesSelectElement.addEventListener("change", updateCity);
 
-let citiesContainer = document.querySelector("#cities");
+const citiesContainer = document.querySelector("#cities");
 citiesContainer.addEventListener("click", removeCity);
+
+enableDragAndDrop();

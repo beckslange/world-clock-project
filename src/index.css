@@ -24,16 +24,22 @@ h2 {
 }
 
 .remove-btn {
-  background: transparent;
+  background: none;
   border: none;
-  color: #888;
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
+  color: #999;
   transition: color 0.2s ease;
 }
 
 .remove-btn:hover {
-  color: #ff4d4d;
+  color: #e74c3c;
+}
+
+#cities {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 select {
@@ -46,10 +52,32 @@ select {
 
 .city {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin: 20px 0;
+  gap: 10px;
   border-bottom: 1px dashed rgba(0, 0, 0, 0.2);
-  padding: 30px 0;
+  padding: 20px 0;
+  background: #fff;
+  border-radius: 8px;
+  transition: transform 0.25s ease, background 0.2s ease;
+}
+
+.drag-handle {
+  cursor: grab;
+  font-size: 20px;
+  margin-right: 10px;
+  user-select: none;
+  color: #888;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.city-dragging {
+  opacity: 0.6;
+  transform: scale(1.02);
+  background: #f0f0f0;
 }
 
 .city:last-child {
@@ -69,6 +97,16 @@ select {
   font-size: 24px;
   line-height: 36px;
   vertical-align: middle;
+}
+
+a {
+  text-decoration: none;
+  color: #5dade2;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #3498db;
 }
 
 footer {
