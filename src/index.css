@@ -23,6 +23,19 @@ h2 {
   font-size: 28px;
 }
 
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.remove-btn:hover {
+  color: #ff4d4d;
+}
+
 select {
   display: block;
   width: 100%;
